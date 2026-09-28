@@ -41,10 +41,12 @@ dependencies:
   sqflite: ^2.3.0              # Database เก็บข้อมูลอาหาร
   path: ^1.8.3                 # ใช้คู่กับ sqflite
   shared_preferences: ^2.2.2   # เก็บข้อมูล user แบบง่าย
-  google_fonts: ^6.1.0         # ฟอนต์สวย รองรับภาษาไทย
+  google_fonts: ^6.2.1        # ฟอนต์สวย รองรับภาษาไทย
   intl: ^0.18.1                # จัดการวันที่/ตัวเลข
   percent_indicator: ^4.2.3    # วงกลม % แคลอรี่คงเหลือ
   fl_chart: ^0.63.0
+  camera: ^0.10.5+9            # กล้องถ่ายภาพจริง
+  image_picker: ^1.1.2         # เลือกรูปจากคลัง/ถ่ายภาพ
 
 dev_dependencies:
   flutter_test:

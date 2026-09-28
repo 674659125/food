@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import '../models/food_model.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../services/food_recommendation.dart';
+import '../theme/app_theme.dart';
 
 class FoodDetailScreen extends StatefulWidget {
-  final String mealType; // 'breakfast', 'lunch', 'dinner'
-  final String mealTitle; // 'มื้อเช้า', 'มื้อกลางวัน', 'มื้อเย็น'
+  final String mealType;
+  final String mealTitle;
   final double targetCalories;
 
   const FoodDetailScreen({
@@ -19,98 +20,182 @@ class FoodDetailScreen extends StatefulWidget {
 }
 
 class _FoodDetailScreenState extends State<FoodDetailScreen> {
-  // เก็บสถานะเช็คลิสต์วัตถุดิบ (key: ชื่ออาหาร, value: list of bool)
   Map<String, List<bool>> checkedStatus = {};
 
   @override
   Widget build(BuildContext context) {
-    List<FoodModel> foods =
-    FoodRecommendation.getFoodsByMealType(widget.mealType);
+    final foods = FoodRecommendation.getFoodsByMealType(widget.mealType);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.mealTitle),
-        backgroundColor: Colors.green,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'เป้าหมาย: ${widget.targetCalories.toStringAsFixed(0)} kcal',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.green,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'เลือกเมนูที่ต้องการ 👇',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: ListView.builder(
-                itemCount: foods.length,
-                itemBuilder: (context, index) {
-                  final food = foods[index];
-                  // สร้าง checklist state ถ้ายังไม่มี
-                  checkedStatus[food.name] ??=
-                      List.generate(food.ingredients.length, (_) => false);
-
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    elevation: 3,
-                    child: ExpansionTile(
-                      title: Text(
-                        food.name,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Text(
-                        '${food.calories.toStringAsFixed(0)} kcal  |  '
-                            'P: ${food.protein.toStringAsFixed(0)}g  '
-                            'C: ${food.carb.toStringAsFixed(0)}g  '
-                            'F: ${food.fat.toStringAsFixed(0)}g',
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'วัตถุดิบ:',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              ...List.generate(food.ingredients.length,
-                                      (i) {
-                                    return CheckboxListTile(
-                                      dense: true,
-                                      contentPadding: EdgeInsets.zero,
-                                      title: Text(food.ingredients[i]),
-                                      value: checkedStatus[food.name]![i],
-                                      onChanged: (val) {
-                                        setState(() {
-                                          checkedStatus[food.name]![i] =
-                                              val ?? false;
-                                        });
-                                      },
-                                    );
-                                  }),
-                            ],
-                          ),
-                        ),
-                      ],
+      backgroundColor: AppColors.background,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [AppColors.blue, AppColors.background],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            stops: [0.0, 0.3],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.arrow_back,
+                          color: AppColors.textDark),
                     ),
-                  );
-                },
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.mealTitle,
+                            style: GoogleFonts.nunito(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textDark,
+                            ),
+                          ),
+                          Text(
+                            'เป้าหมาย ${widget.targetCalories.toInt()} kcal',
+                            style: GoogleFonts.nunito(
+                              fontSize: 13,
+                              color: AppColors.textLight,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: foods.length,
+                  itemBuilder: (context, index) {
+                    final food = foods[index];
+                    checkedStatus[food.name] ??=
+                        List.generate(food.ingredients.length, (_) => false);
+
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.pinkDark.withValues(alpha: 0.15),
+                            blurRadius: 12,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Theme(
+                        data: Theme.of(context).copyWith(
+                          dividerColor: Colors.transparent,
+                        ),
+                        child: ExpansionTile(
+                          tilePadding:
+                          const EdgeInsets.symmetric(horizontal: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          title: Text(
+                            food.name,
+                            style: GoogleFonts.nunito(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: AppColors.textDark,
+                            ),
+                          ),
+                          subtitle: Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Wrap(
+                              spacing: 8,
+                              children: [
+                                _macroBadge(
+                                    '${food.calories.toInt()} kcal',
+                                    AppColors.pinkDark),
+                                _macroBadge(
+                                    'P ${food.protein.toInt()}g',
+                                    AppColors.blueDark),
+                                _macroBadge(
+                                    'C ${food.carb.toInt()}g',
+                                    AppColors.lavender),
+                                _macroBadge(
+                                    'F ${food.fat.toInt()}g',
+                                    Colors.orange.shade200),
+                              ],
+                            ),
+                          ),
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '🧺 วัตถุดิบ',
+                                    style: GoogleFonts.nunito(
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textDark,
+                                    ),
+                                  ),
+                                  ...List.generate(food.ingredients.length,
+                                          (i) {
+                                        return CheckboxListTile(
+                                          dense: true,
+                                          contentPadding: EdgeInsets.zero,
+                                          activeColor: AppColors.pinkDark,
+                                          title: Text(
+                                            food.ingredients[i],
+                                            style: GoogleFonts.nunito(fontSize: 14),
+                                          ),
+                                          value: checkedStatus[food.name]![i],
+                                          onChanged: (val) {
+                                            setState(() {
+                                              checkedStatus[food.name]![i] =
+                                                  val ?? false;
+                                            });
+                                          },
+                                        );
+                                      }),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _macroBadge(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        text,
+        style: GoogleFonts.nunito(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: color,
         ),
       ),
     );
